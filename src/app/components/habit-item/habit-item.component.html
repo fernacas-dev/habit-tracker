@@ -1,0 +1,19 @@
+<li class="my-8">
+
+  <a class="block max-w p-6 py-8 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-">
+
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white text-center">{{item.title}} </h5>
+    <span class="float-left p-3 rounded-md text-white text-md bg-gray-800 cursor-pointer" (click)="showHeatmap()">
+      <fa-icon [icon]="faArrowUp"></fa-icon>
+    </span>
+    <!-- <app-toggle class="float-left" (valueChanged)="update()"></app-toggle> -->
+    <app-toggle class="float-right" (valueChanged)="updateToggle($event)"></app-toggle>
+    <!-- <p class="font-normal text-gray-700 dark:text-gray-400">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.</p> -->
+  </a>
+
+  @if(open){
+  <div class="p-12 m-auto bg-gray-100 rounded-b-lg" *ngIf="open">
+    <app-heat-map [data]="item.data" [title]="item.title"></app-heat-map>
+  </div>
+  }
+</li>

@@ -1,0 +1,5 @@
+<ul class="my-8">
+  @for(item of items; track $index) {
+  <app-habit-item [item]="item" (toggleUpdated)="toggleUpdated($event)"></app-habit-item>
+  }
+</ul>
