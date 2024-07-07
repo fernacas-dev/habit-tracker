@@ -4,11 +4,12 @@ import { HabitsService } from '../../services/habits.service';
 import { CommonModule } from '@angular/common';
 import { NgxBottomSheetModalService } from 'ngx-bottom-sheet-modal';
 import { ModalComponent } from '../modal/modal.component';
+import { SpinnerComponent } from '../spinner/spinner.component';
 
 @Component({
   selector: 'app-habit-list',
   standalone: true,
-  imports: [HabitItemComponent, CommonModule],
+  imports: [HabitItemComponent, CommonModule, SpinnerComponent],
   templateUrl: './habit-list.component.html',
   styleUrl: './habit-list.component.scss'
 })
