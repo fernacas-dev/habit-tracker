@@ -3,6 +3,8 @@
 <img src="screen-1.png" alt="drawing" width="500"/>
 <img src="screen-2.png" alt="drawing" width="500"/>
 
+<a href='https://ko-fi.com/T6T14PGKO' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 ## Description
 Habits Tracker is a web application developed with Angular and Appwrite that allows users to track their daily habits. Users can create, update, and delete habits, as well as view their progress over time.
 
