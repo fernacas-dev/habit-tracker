@@ -84,7 +84,6 @@ export class HabitFormComponent {
       };
 
       this.habitService._creatingHabit$.next(habit);
-      this.habitService._items$.next(this.userId);
 
       this.form.reset();
 

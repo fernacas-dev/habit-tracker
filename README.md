@@ -1,27 +1,100 @@
-# HabitTrackerNg
+# Habits Tracker
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.0.
+<img src="screen-1.png" alt="drawing" width="500"/>
+<img src="screen-2.png" alt="drawing" width="500"/>
 
-## Development server
+## Description
+Habits Tracker is a web application developed with Angular and Appwrite that allows users to track their daily habits. Users can create, update, and delete habits, as well as view their progress over time.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Features
+- **User Authentication:** Users can register, log in, and log out.
+- **Habit Management:** Users can add, edit, and delete habits.
+- **Progress Tracking:** Users can mark habits as completed and view their progress history.
+- **Intuitive Interface:** The application features a user-friendly interface.
 
-## Code scaffolding
+## Technologies Used
+- **Angular:** Frontend framework.
+- **Appwrite:** Backend platform providing services like authentication, database, and storage.
+- **TypeScript:** Programming language used for the application development.
+- **HTML and CSS:** Technologies used for the structure and design of the user interface.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Installation and Setup
 
-## Build
+### Prerequisites
+- Node.js (version 12 or higher)
+- Angular CLI
+- Docker (for running Appwrite)
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Installation Steps
 
-## Running unit tests
+1. **Clone the repository:**
+    ```sh
+    git clone https://github.com/your_username/habits-tracker.git
+    cd habits-tracker
+    ```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+2. **Install dependencies:**
+    ```sh
+    npm install --force
+    ```
 
-## Running end-to-end tests
+3. **Set up Appwrite:**
+   - Follow the instructions in the [official Appwrite documentation](https://appwrite.io/docs) to set up the Appwrite server using Docker.
+   - Create a new project in Appwrite.
+   - Configure authentication and the database as needed.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+4. **Configure environment variables:**
+   - Create an .env file in the root directory and add your Appwrite configuration details:
+     ```env
+      ENDPOINT=https://cloud.appwrite.io/v1 # or your own Appwrite server
+      PROJECT_ID=your-project-id
+      DATABASE_ID=database-id
+     ```
 
-## Further help
+5. **Start the Angular application:**
+    ```sh
+    ng serve
+    ```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+6. **Open the application in the browser:**
+    - Visit `http://localhost:4200` in your preferred browser.
+
+## Usage
+
+1. **Registration and Login:**
+   - Create an account or log in with an existing account.
+
+2. **Habit Management:**
+   - Add new habits using the habit creation form.
+   - Edit or delete existing habits from the habits list.
+
+3. **Progress Tracking:**
+   - Mark habits as completed to track daily progress.
+   - View the history of completed habits.
+
+## Contribution
+
+1. **Fork the repository**
+2. **Create a feature branch:**
+    ```sh
+    git checkout -b feature/new-feature
+    ```
+3. **Commit your changes:**
+    ```sh
+    git commit -m 'Add new feature'
+    ```
+4. **Push to the remote branch:**
+    ```sh
+    git push origin feature/new-feature
+    ```
+5. **Create a Pull Request**
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- **Name:** Fernando Castellanos
+- **GitHub:** [fernacas-dev](https://github.com/fernacas-dev)
+

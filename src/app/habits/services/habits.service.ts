@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { AppwriteApi } from '../../lib/appwrite/appwrite';
 import { Habit } from '../models/habit.model';
 import { ID, Query } from 'appwrite';
-import { debounceTime, from, map, Observable, ReplaySubject, switchMap, tap } from 'rxjs';
+import { from, map, Observable, ReplaySubject, share, switchMap, take, tap } from 'rxjs';
 import moment from 'moment';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class HabitsService {
 
   private readonly appwriteAPI = inject(AppwriteApi);
 
-  public generateData(count: number, yrange: any, dayOfWeek: string, dates: string[]) {
+  generateData(count: number, yrange: any, dayOfWeek: string, dates: string[]) {
     const res = this.getDayAndWeekInfo(dates);
     let series: any[] = [];
     let i = 1;
@@ -69,14 +69,31 @@ export class HabitsService {
   _items$ = new ReplaySubject<string>();
 
   items$ = this._items$.pipe(
-    debounceTime(1000),
-    switchMap((userId) => this.getItems(userId))
+    switchMap((userId) => this.getItems(userId)),
   );
 
   _creatingHabit$ = new ReplaySubject<Habit>();
 
   creatingHabit$ = this._creatingHabit$.pipe(
     switchMap((habit) => this.addHabit(habit))
+  );
+
+  _updatingDate$ = new ReplaySubject<{ id: string, date: Date, userId: string }>();
+
+  updatingDate$ = this._updatingDate$.pipe(
+    switchMap((data) => this.updateDate(data.id, data.date, data.userId))
+  );
+
+  _removingDate$ = new ReplaySubject<{ id: string, date: Date, userId: string }>();
+
+  removingDate$ = this._removingDate$.pipe(
+    switchMap((data) => this.removeDate(data.id, data.date, data.userId))
+  );
+
+  _deletingHabit$ = new ReplaySubject<{ id: string, userId: string }>();
+
+  deletingHabit$ = this._deletingHabit$.pipe(
+    switchMap((habit) => this.removeHabit(habit.id, habit.userId)),
   );
 
   getItems(userId: string): Observable<any> {
@@ -102,7 +119,7 @@ export class HabitsService {
         ));
   }
 
-  addItem(id: string, date: Date, userId: string) {
+  updateDate(id: string, date: Date, userId: string) {
     return from(this.appwriteAPI.database.getDocument('habitsdb', 'habits', id)).pipe(
       map((item: any) => {
         item.dates.push(moment(date).format('DD/MM/YYYY'));
@@ -115,11 +132,11 @@ export class HabitsService {
         } as Habit
       }),
       switchMap((habit) => this.appwriteAPI.database.updateDocument('habitsdb', 'habits', id, habit)),
-      tap(() => this._items$.next(userId)),
+      switchMap(async () => this._items$.next(userId)),
     )
   }
 
-  removeItem(id: string, date: Date, userId: string) {
+  removeDate(id: string, date: Date, userId: string) {
     return from(this.appwriteAPI.database.getDocument('habitsdb', 'habits', id)).pipe(
       map((item: any) => {
         item.dates = item.dates.filter((d: string) => d !== moment(date).format('DD/MM/YYYY'));
@@ -132,19 +149,21 @@ export class HabitsService {
         } as Habit
       }),
       switchMap((habit) => this.appwriteAPI.database.updateDocument('habitsdb', 'habits', id, habit)),
-      tap(() => this._items$.next(userId)),
+      switchMap(async () => this._items$.next(userId)),
     )
   }
 
   addHabit(habit: Habit) {
-    return from(this.appwriteAPI.database.createDocument('habitsdb', 'habits', ID.unique(), habit)).pipe(
-      tap(() => this._items$.next(habit.user_id))
-    );
+    return from(this.appwriteAPI.database.createDocument('habitsdb', 'habits', ID.unique(), habit))
+      .pipe(
+        switchMap(async () => this._items$.next(habit.user_id))
+      );
   }
 
   removeHabit(id: string, userId: string) {
-    return from(this.appwriteAPI.database.deleteDocument('habitsdb', 'habits', id)).pipe(
-      tap(() => this._items$.next(userId))
-    );
+    return from(this.appwriteAPI.database.deleteDocument('habitsdb', 'habits', id))
+      .pipe(
+        switchMap(async () => this._items$.next(userId))
+      );
   }
 }
