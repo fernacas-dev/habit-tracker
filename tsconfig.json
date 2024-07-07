@@ -22,7 +22,12 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+   "baseUrl": "src",
+    "paths": {
+      "@habits/*": ["app/habits/*"],
+      "@lib/*": ["app/lib/*"],
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

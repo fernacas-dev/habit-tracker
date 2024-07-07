@@ -1,17 +1,11 @@
 import { Routes } from '@angular/router';
-import { HabitsComponent } from './components/habits/habits.component';
-import { userLoggedGuard } from './guards/user-logged.guard';
+import { userLoggedGuard } from './lib/auth/guards/user-logged.guard';
+import { HabitsComponent } from '@habits/habits.component';
 
 export const routes: Routes = [
   {
-    path: 'register',
-    loadComponent: () =>
-      import('./register/register.component').then((m) => m.RegisterComponent),
-  },
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./login/login.component').then((m) => m.LoginComponent),
+    path: 'auth',
+    loadChildren: () => import('./lib/auth/auth.module').then(m => m.AuthModule)
   },
   {
     path: '',
@@ -20,6 +14,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'chat',
+    redirectTo: '',
   }
 ];
