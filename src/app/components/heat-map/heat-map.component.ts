@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 
 import {
   ChartComponent,
@@ -6,8 +6,10 @@ import {
   ApexChart,
   ApexTitleSubtitle,
   NgApexchartsModule,
-  ApexDataLabels
+  ApexDataLabels,
+  ApexResponsive
 } from "ng-apexcharts";
+import { HabitHeatmap } from '../../models/habit.model';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -17,6 +19,7 @@ export type ChartOptions = {
   colors: any;
   plotOptions: any;
   noData: any;
+  responsive: ApexResponsive[];
 }
 
 @Component({
@@ -30,47 +33,48 @@ export class HeatMapComponent {
 
   @ViewChild("chart") chart!: ChartComponent;
 
-  private _data: any[] = [];
-  private _title: string = '';
+  private _data!: HabitHeatmap;
+  private _name!: string;
 
   @Input()
-  get data(): any[] {
+  get data(): HabitHeatmap {
     return this._data;
   }
 
-  set data(value: any[]) {
-    if (value.length > 0) {
+  set data(value: HabitHeatmap) {
+    if (value !== null) {
       this._data = value;
       this.updateSerie();
     }
   }
 
   @Input()
-  get title(): string {
-    return this._title;
+  get name(): string {
+    return this._name;
   }
 
-  set title(value: string) {
-    if (value.length > 0) {
-      this._title = value;
-      this.chartOptions.title = {
-        text: this.title
-      }
+  set name(value: string) {
+    if (value !== null) {
+      this._name = value;
+      this.updateSerie();
     }
   }
 
   public chartOptions: Partial<ChartOptions> = {
     series: [],
     chart: {
-      height: 350,
-      type: "heatmap"
+      type: 'heatmap',
+      height: 300,
+      toolbar: {
+        show: false
+      }
     },
     dataLabels: {
       enabled: false
     },
     colors: ["#238636"],
     title: {
-      text: this.title,
+      text: this.name,
     },
     noData: {
       text: undefined,
@@ -84,6 +88,22 @@ export class HeatMapComponent {
         fontFamily: undefined
       }
     },
+    responsive: [
+      {
+        breakpoint: 1000,
+        options: {
+          chart: {
+            width: '100%',
+            height: '100%'
+          },
+          plotOptions: {
+            heatmap: {
+              radius: 0
+            }
+          }
+        }
+      }
+    ],
     plotOptions: {
       heatmap: {
         radius: 5,
@@ -102,6 +122,7 @@ export class HeatMapComponent {
           }
           ]
         }
+        ,
       }
     }
   };
@@ -110,31 +131,31 @@ export class HeatMapComponent {
     this.chartOptions.series = [
       {
         name: "Sunday",
-        data: this.data[0]
+        data: this.data!.dates[0]
       },
       {
         name: "Monday",
-        data: this.data[1]
+        data: this.data!.dates[1]
       },
       {
         name: "Tuesday",
-        data: this.data[2]
+        data: this.data!.dates[2]
       },
       {
         name: "Wednesday",
-        data: this.data[3]
+        data: this.data!.dates[3]
       },
       {
         name: "Thursday",
-        data: this.data[4]
+        data: this.data!.dates[4]
       },
       {
         name: "Friday",
-        data: this.data[5]
+        data: this.data!.dates[5]
       },
       {
         name: "Saturday",
-        data: this.data[6]
+        data: this.data!.dates[6]
       },
     ].reverse();
   }

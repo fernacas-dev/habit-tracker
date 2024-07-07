@@ -1,14 +1,16 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { AppwriteApi } from '../appwrite';
+import { Habit } from '../models/habit.model';
+import { ID, Query } from 'appwrite';
+import { debounceTime, from, map, Observable, ReplaySubject, switchMap } from 'rxjs';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HabitsService {
-  dates: string[] = [
-    '2024-04-22',
-    '2024-04-28',
-    '2024-05-28',
-  ];
+
+  private readonly appwriteAPI = inject(AppwriteApi);
 
   public generateData(count: number, yrange: any, dayOfWeek: string, dates: string[]) {
     const res = this.getDayAndWeekInfo(dates);
@@ -19,7 +21,6 @@ export class HabitsService {
       const item = res.filter(r => r.weekNumber === i && r.dayOfWeek === dayOfWeek);
 
       if (item.length > 0) {
-        // console.log(item);
         series.push({
           x: x,
           y: 1
@@ -65,43 +66,79 @@ export class HabitsService {
     return res;
   }
 
+  _items$ = new ReplaySubject<string>();
 
-  getItems() {
-    return [
-      {
-        id: 1,
-        data: [
-          this.generateData(53, { min: 0, max: 1 }, 'sunday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'monday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'tuesday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'wednesday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'thursday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'friday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'saturday', this.dates),
-        ],
-        title: 'Hacer ejercicio'
-      },
-      {
-        id: 2,
-        data: [
-          this.generateData(53, { min: 0, max: 1 }, 'sunday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'monday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'tuesday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'wednesday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'thursday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'friday', this.dates),
-          this.generateData(53, { min: 0, max: 1 }, 'saturday', this.dates),
-        ],
-        title: 'Hacer ejercicio'
-      },
-    ]
+  items$ = this._items$.pipe(
+    debounceTime(1000),
+    switchMap((userId) => this.getItems(userId))
+  );
+
+  _creatingHabit$ = new ReplaySubject<Habit>();
+
+  creatingHabit$ = this._creatingHabit$.pipe(
+    switchMap((habit) => this.addHabit(habit))
+  );
+
+  getItems(userId: string): Observable<any> {
+    return from(this.appwriteAPI.database.listDocuments('habitsdb', 'habits', [
+      Query.equal('user_id', [userId]),
+    ]))
+      .pipe(
+        map(data => data.documents.map((item: any) => {
+          return {
+            ...item,
+            dates: [
+              this.generateData(53, { min: 0, max: 1 }, 'sunday', item.dates),
+              this.generateData(53, { min: 0, max: 1 }, 'monday', item.dates),
+              this.generateData(53, { min: 0, max: 1 }, 'tuesday', item.dates),
+              this.generateData(53, { min: 0, max: 1 }, 'wednesday', item.dates),
+              this.generateData(53, { min: 0, max: 1 }, 'thursday', item.dates),
+              this.generateData(53, { min: 0, max: 1 }, 'friday', item.dates),
+              this.generateData(53, { min: 0, max: 1 }, 'saturday', item.dates),
+            ],
+            defaultDates: item.dates
+          }
+        }),
+        ));
   }
 
-  addItem(date: Date) {
-    this.dates.push(date.toDateString());
+  addItem(id: string, date: Date) {
+    return from(this.appwriteAPI.database.getDocument('habitsdb', 'habits', id)).pipe(
+      map((item: any) => {
+        item.dates.push(moment(date).format('DD/MM/YYYY'));
+        return {
+          $id: item.$id,
+          name: item.name,
+          dates: item.dates,
+          user_id: item.user_id,
+          description: item.description,
+        } as Habit
+      }),
+      switchMap((habit) => this.appwriteAPI.database.updateDocument('habitsdb', 'habits', id, habit)),
+    )
   }
 
-  removeItem(date: Date) {
-    delete this.dates[this.dates.indexOf(date.toDateString())];
+  removeItem(id: string, date: Date) {
+    return from(this.appwriteAPI.database.getDocument('habitsdb', 'habits', id)).pipe(
+      map((item: any) => {
+        item.dates = item.dates.filter((d: string) => d !== moment(date).format('DD/MM/YYYY'));
+        return {
+          $id: item.$id,
+          name: item.name,
+          dates: item.dates,
+          user_id: item.user_id,
+          description: item.description,
+        } as Habit
+      }),
+      switchMap((habit) => this.appwriteAPI.database.updateDocument('habitsdb', 'habits', id, habit))
+    )
+  }
+
+  addHabit(habit: Habit) {
+    return from(this.appwriteAPI.database.createDocument('habitsdb', 'habits', ID.unique(), habit));
+  }
+
+  removeHabit(id: string) {
+    return from(this.appwriteAPI.database.deleteDocument('habitsdb', 'habits', id));
   }
 }

@@ -1,5 +1,6 @@
 <ul class="my-8">
-  @for(item of items; track $index) {
-  <app-habit-item [item]="item" (toggleUpdated)="toggleUpdated($event)"></app-habit-item>
+  @for(itemHeatmap of itemHeatmaps$|async; track $index) {
+  <app-habit-item [itemHeatmap]="itemHeatmap" (toggleUpdated)="toggleUpdated($event)"
+    (removeHabit)="removeHabit($event)"></app-habit-item>
   }
 </ul>

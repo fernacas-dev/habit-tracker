@@ -1,0 +1,33 @@
+@if(user$ | async; as user){
+<app-header [userId]="user.userId"></app-header>
+
+<div class="flex justify-center">
+
+  <div class="w-full md:w-3/4 sm:mx-0 md:px-10">
+    <!-- <app-heat-map [data]="data" [title]="title"></app-heat-map> -->
+    <div class="fixed bottom-6 right-6">
+      @if(!isCreating){
+      <button (click)="onToggled()"
+        class="z-100 bg-green-500 text-white font-medium rounded-full py-4 px-6 flex items-center justify-center hover:bg-yellow-600 transition duration-300 ease-in-out shadow-lg">
+        +
+      </button>
+
+      } @else {
+      <button (click)="onToggled()"
+        class="z-100 bg-red-500 text-white font-medium rounded-full py-4 px-6 flex items-center justify-center hover:bg-yellow-600 transition duration-300 ease-in-out shadow-lg">
+        X
+      </button>
+
+      }
+    </div>
+
+    @if(isCreating){
+    <app-habit-form [userId]="user.userId"></app-habit-form>
+    }
+    <app-habit-list [userId]="user.userId"></app-habit-list>
+
+
+  </div>
+</div>
+}
+<ngx-bottom-sheet-modal></ngx-bottom-sheet-modal>
