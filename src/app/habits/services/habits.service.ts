@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { AppwriteApi } from '../../lib/appwrite/appwrite';
 import { Habit } from '../models/habit.model';
 import { ID, Query } from 'appwrite';
-import { debounceTime, from, map, Observable, ReplaySubject, switchMap } from 'rxjs';
+import { debounceTime, from, map, Observable, ReplaySubject, switchMap, tap } from 'rxjs';
 import moment from 'moment';
 
 @Injectable({
@@ -102,7 +102,7 @@ export class HabitsService {
         ));
   }
 
-  addItem(id: string, date: Date) {
+  addItem(id: string, date: Date, userId: string) {
     return from(this.appwriteAPI.database.getDocument('habitsdb', 'habits', id)).pipe(
       map((item: any) => {
         item.dates.push(moment(date).format('DD/MM/YYYY'));
@@ -115,10 +115,11 @@ export class HabitsService {
         } as Habit
       }),
       switchMap((habit) => this.appwriteAPI.database.updateDocument('habitsdb', 'habits', id, habit)),
+      tap(() => this._items$.next(userId)),
     )
   }
 
-  removeItem(id: string, date: Date) {
+  removeItem(id: string, date: Date, userId: string) {
     return from(this.appwriteAPI.database.getDocument('habitsdb', 'habits', id)).pipe(
       map((item: any) => {
         item.dates = item.dates.filter((d: string) => d !== moment(date).format('DD/MM/YYYY'));
@@ -130,15 +131,20 @@ export class HabitsService {
           description: item.description,
         } as Habit
       }),
-      switchMap((habit) => this.appwriteAPI.database.updateDocument('habitsdb', 'habits', id, habit))
+      switchMap((habit) => this.appwriteAPI.database.updateDocument('habitsdb', 'habits', id, habit)),
+      tap(() => this._items$.next(userId)),
     )
   }
 
   addHabit(habit: Habit) {
-    return from(this.appwriteAPI.database.createDocument('habitsdb', 'habits', ID.unique(), habit));
+    return from(this.appwriteAPI.database.createDocument('habitsdb', 'habits', ID.unique(), habit)).pipe(
+      tap(() => this._items$.next(habit.user_id))
+    );
   }
 
-  removeHabit(id: string) {
-    return from(this.appwriteAPI.database.deleteDocument('habitsdb', 'habits', id));
+  removeHabit(id: string, userId: string) {
+    return from(this.appwriteAPI.database.deleteDocument('habitsdb', 'habits', id)).pipe(
+      tap(() => this._items$.next(userId))
+    );
   }
 }

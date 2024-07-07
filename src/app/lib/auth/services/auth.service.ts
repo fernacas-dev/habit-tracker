@@ -48,7 +48,7 @@ export class AuthService {
     return from(authReq).pipe(
       catchError(err => {
         return err;
-      }),);
+      }));
   }
 
   isLoggedIn(): Observable<boolean> {
@@ -62,7 +62,7 @@ export class AuthService {
       // console.log(`${e}`);
     } finally {
       this._user.next(null);
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/auth/login');
     }
   }
 }

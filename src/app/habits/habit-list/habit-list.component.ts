@@ -35,9 +35,9 @@ export class HabitListComponent implements OnInit {
 
   toggleUpdated(data: { id: string, date: Date, event: boolean }) {
     if (data.event) {
-      this.habitsService.addItem(data.id, data.date).subscribe(() => this.habitsService._items$.next(this.userId));
+      this.habitsService.addItem(data.id, data.date, this.userId);
     } else {
-      this.habitsService.removeItem(data.id, data.date).subscribe(() => this.habitsService._items$.next(this.userId));
+      this.habitsService.removeItem(data.id, data.date, this.userId);
     }
   }
 
@@ -58,14 +58,14 @@ export class HabitListComponent implements OnInit {
         title: "Remove Habit",
         description: "Are you sure you want to remove this habit?",
         okAction: () => {
-          this.habitsService.removeHabit(id).subscribe(() => this.habitsService._items$.next(this.userId));
+          this.habitsService.removeHabit(id, this.userId);
           this.ngxBottomSheetModalService.closeBottomSheet();
         }
       },
       onClose: () => {
         this.opened = false;
       },
-      closeButtonClass: "text-cyan-400 dark:text-cyan-200",
+      closeButtonClass: "text-red-500",
     });
     this.opened = true;
   }
