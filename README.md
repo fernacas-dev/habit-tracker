@@ -21,9 +21,8 @@ Habits Tracker is a web application developed with Angular and Appwrite that all
 ## Installation and Setup
 
 ### Prerequisites
-- Node.js (version 12 or higher)
+- Node.js (version 20 or higher)
 - Angular CLI
-- Docker (for running Appwrite)
 
 ### Installation Steps
 
