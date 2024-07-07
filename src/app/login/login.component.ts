@@ -32,7 +32,7 @@ export class LoginComponent {
       const loginDto = this.form.value as LoginDto;
       this.authService
         .login(loginDto)
-        .subscribe(() => this.router.navigateByUrl('/chat'));
+        .subscribe(() => this.router.navigateByUrl('/'));
     }
   }
 }
